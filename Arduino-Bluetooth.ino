@@ -276,14 +276,16 @@ void loop()
     ble_do_events();
    if ( ble_available() )
   {
+    Serial.print("Recieved:");
     String Scmd = "";
     while(ble_available())
     {
-      byte cmd;
+      char cmd;
       cmd = ble_read();
       Scmd.concat(cmd);
     }
       // Parse data here
+      Serial.println();
       Serial.println("CMD:" + Scmd);
       if (Scmd == "UNLOCK"){
         Serial.println("Unlocking");
