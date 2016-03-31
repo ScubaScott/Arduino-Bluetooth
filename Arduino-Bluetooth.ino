@@ -287,11 +287,26 @@ void loop()
       // Parse data here
       Serial.println();
       Serial.println("CMD:" + Scmd);
+
+      myGLCD.setColor(0, 255, 0);
+      myGLCD.print(Scmd, CENTER, 192);
+      delay(500);
+      myGLCD.print("            ", CENTER, 192);
+      myGLCD.setColor(0, 255, 0);
+      
       if (Scmd == "UNLOCK"){
         Serial.println("Unlocking");
         byte buf[] = {'D','O','N','E'};         
-        ble_write_string(buf, 4);   
-      }else
+        ble_write_string(buf, 4);
+        
+        myGLCD.setColor(0, 255, 0);
+        myGLCD.print("UNLOCKED", CENTER, 192);
+        delay(500);
+        myGLCD.print("            ", CENTER, 192);
+        delay(500);
+        myGLCD.setColor(0, 255, 0);   
+        
+        }else
       {
         Serial.println("Unknown command");
         byte buf[] = {'E','R','R','O','R'};         
