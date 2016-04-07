@@ -65,7 +65,8 @@ void drawLock()
     myGLCD.setColor(0, 0, 255);
     myGLCD.fillRoundRect(20, 70, 120, 170);
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("MasterLock", 32, 150);
+    myGLCD.print("Pedal", 32, 100);
+    myGLCD.print("Pac", 45, 130);
     
 }
 
@@ -108,15 +109,19 @@ void setup()
 // Initial setup
   Serial.begin(57600);
   Serial.println("BLE Arduino Slave");
-  ble_begin();
   
+
+  // Set your BLE Shield name here, max. length 10
+  ble_set_name("PedalPac-1");
+  
+  ble_begin(); 
   myGLCD.InitLCD();
   myGLCD.clrScr();
 
   myTouch.InitTouch();
   myTouch.setPrecision(PREC_MEDIUM);
 
-  myGLCD.setFont(SmallFont);
+  myGLCD.setFont(BigFont);
   myGLCD.setBackColor(0, 0, 255);
   drawLock();  
 }
