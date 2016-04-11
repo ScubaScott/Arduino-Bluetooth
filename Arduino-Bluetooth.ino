@@ -40,6 +40,8 @@ char stCurrent[20]="";
 int stCurrentLen=0;
 char stLast[20]="";
 bool locked = true;
+int iLockPin = 53;
+String key;
 
 /*************************
 **   Custom functions   **
@@ -109,10 +111,12 @@ void setup()
 // Initial setup
   Serial.begin(57600);
   Serial.println("BLE Arduino Slave");
-  
+
+  digitalWrite(iLockPin, HIGH);
+  pinMode(iLockPin, OUTPUT);
 
   // Set your BLE Shield name here, max. length 10
-  ble_set_name("PedalPac-1");
+  ble_set_name("PLocker-01");
   
   ble_begin(); 
   myGLCD.InitLCD();
@@ -123,7 +127,9 @@ void setup()
 
   myGLCD.setFont(BigFont);
   myGLCD.setBackColor(0, 0, 255);
-  drawLock();  
+  
+  drawLock();
+    
 }
 
 void loop()
@@ -166,29 +172,58 @@ void loop()
         myGLCD.setColor(0, 255, 0);
         
         if (Scmd == "UNLOCK"){
-          Serial.println("Unlocking");
-          byte buf[] = {'D','O','N','E'};         
-          ble_write_string(buf, 4);
-          
-          myGLCD.setColor(0, 255, 0);
-          myGLCD.print("UNLOCKING", CENTER, 192);
-          delay(500);
-          myGLCD.print("            ", CENTER, 192);
-          delay(500);
-          myGLCD.setColor(0, 255, 0);   
-          locked = false;
-          }else if(Scmd == "LOCK"){
-          Serial.println("locking");
-          byte buf[] = {'D','O','N','E'};         
-          ble_write_string(buf, 4);
-          
-          myGLCD.setColor(0, 255, 0);
-          myGLCD.print("LOCKING", CENTER, 192);
-          delay(500);
-          myGLCD.print("            ", CENTER, 192);
-          delay(500);
-          myGLCD.setColor(0, 255, 0);   
-          locked = true;
+            Serial.println("Unlocking");
+            byte buf[] = {'D','O','N','E'};         
+            ble_write_string(buf, 4);
+            
+            locked = false;
+            drawLock();
+            
+            myGLCD.setColor(0, 255, 0);
+            myGLCD.print("UNLOCKED", CENTER, 192);
+            //unlock door for 5 seconds
+            digitalWrite(iLockPin, LOW);
+            delay(5000);
+            
+            digitalWrite(iLockPin, HIGH);
+            myGLCD.print("            ", CENTER, 192);
+            myGLCD.setColor(0, 255, 0);   
+
+            locked = true;
+            drawLock();
+            
+          }else if(Scmd == "AUTH"){
+            key = String(millis());
+            key = key + String(random(10, 99));
+            Serial.println(key);
+            Serial.println(String(key.length()));
+           
+            byte keybyte[key.length()];
+            
+            Serial.println(String(sizeof(keybyte)));
+            key.getBytes(keybyte,key.length());
+            ble_write_string(keybyte,sizeof(keybyte));
+            
+          }else if(Scmd == key){
+            Serial.println("Unlocking");
+            byte buf[] = {'D','O','N','E'};         
+            ble_write_string(buf, 4);
+            
+            locked = false;
+            drawLock();
+            
+            myGLCD.setColor(0, 255, 0);
+            myGLCD.print("UNLOCKED", CENTER, 192);
+            //unlock door for 5 seconds
+            digitalWrite(iLockPin, LOW);
+            delay(5000);
+            
+            digitalWrite(iLockPin, HIGH);
+            myGLCD.print("            ", CENTER, 192);
+            myGLCD.setColor(0, 255, 0);   
+
+            locked = true;
+            drawLock();
           }else
         {
           Serial.println("Unknown command");
